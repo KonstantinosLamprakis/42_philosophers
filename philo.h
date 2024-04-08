@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/14 15:42:40 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/08 13:05:05 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/08 14:01:14 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ typedef struct	s_philo
 	char		state;
 	long		last_eat;
 	int			eaten_n;
-	t_info		info;
+	pthread_t	thread;
+	t_info		*info;
 }				t_philo;
 
 // Declarations of validation.c

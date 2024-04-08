@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/08 11:51:09 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/08 14:21:20 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,43 @@
 
 // https://www.geeksforgeeks.org/mutex-lock-for-linux-thread-synchronization/
 
+void	*thread_routine(void *philo);
+
 int	main(int argc, char **argv)
 {
-	if(!check_input(&s_args, argc, argv))
+	t_info			info_s;
+	t_philo			*philo_s;
+	int				i;
+
+	if(!check_input(&info_s, argc, argv))
 		return (1);
+	info_s.forks = malloc (sizeof(pthread_mutex_t) * info_s.phil_n);
+	if (!info_s.forks)
+		return (1);
+	philo_s = malloc (sizeof(pthread_mutex_t) * info_s.phil_n);
+	if (!philo_s)
+		return (free(info_s.forks), 1);
+	pthread_mutex_init(&(info_s.print_m), NULL);
+	i = -1;
+	while (++i < info_s.phil_n)
+		pthread_mutex_init(&(info_s.forks[i]), NULL);
+	i = -1;
+	while (++i < info_s.phil_n)
+	{
+		philo_s[i].eaten_n = 0;
+		philo_s[i].id = i;
+		philo_s[i].info = &info_s;
+		philo_s[i].state = 't';
+		pthread_create(&(philo_s[i].thread), NULL, thread_routine, (void *)&philo_s[i]);
+	}
+}
+
+void	*thread_routine(void *philo)
+{
+	t_philo	*philo_s;
+
+	philo_s = (t_philo*)philo;
+	pthread_mutex_lock(&(philo_s->info->print_m));
+	printf("Thread [%ld]: Count at thread start = %d\n", pthread_self(), philo_s->id);
+	pthread_mutex_unlock(&(philo_s->info->print_m));
 }
