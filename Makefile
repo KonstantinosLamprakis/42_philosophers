@@ -6,7 +6,7 @@
 #    By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/08 02:28:31 by klamprak          #+#    #+#              #
-#    Updated: 2024/04/08 03:43:40 by klamprak         ###   ########.fr        #
+#    Updated: 2024/04/08 08:03:34 by klamprak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,11 @@ HEADERS = philo.h
 all: $(NAME)
 
 %.o: %.c
-	cc $(CFLAGS) -o $@ -c $< -I $(HEADERS)
+	cc -o $@ -c $< -I $(HEADERS)
+	# cc $(CFLAGS) -o $@ -c $< -I $(HEADERS)
+
+noflags: $(OBJS)
+	cc $(OBJS) -I $(HEADERS) -o $(NAME)
 
 $(NAME): $(OBJS) $(HEADERS)
 	cc $(CFLAGS) $(OBJS) -I $(HEADERS) -o $(NAME)

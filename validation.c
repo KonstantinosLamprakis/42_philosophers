@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:21:39 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/08 03:41:56 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/08 13:05:41 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static int	ft_atoi(const char *str);
 // returns 0 in error, 1 in success and puts the result on t_ar
 // eat_n = -1 means there no argument for number of eating
 // validation: 5 or 6 number of args, all of them positive ints
-int	check_input(t_args *t_ar, int argc, char **argv)
+int	check_input(t_info *t_ar, int argc, char **argv)
 {
 	int	err;
 
