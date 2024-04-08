@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/14 15:42:40 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/08 03:38:56 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/08 04:44:02 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 # define PHILO_H
 
 # include <unistd.h>
+# include <pthread.h>
+# include <sys/time.h>
+# include <stdio.h>
 // Custom declarations
 # define BUFFER_SIZE 42
 
