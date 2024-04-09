@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/09 09:45:14 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/09 11:13:46 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 // use safe functions ex. write instead of printf
 // check for errors wherever I have != 0
 // take care of case of single philo on table
+// start check_if_die in different process and pass a flag to all threads to
+// stop if someone die and also remove print mutex(same for eaten_num)
 
 // https://www.geeksforgeeks.org/mutex-lock-for-linux-thread-synchronization/
 
@@ -36,6 +38,7 @@
 
 void	*thread_routine(void *philo);
 long	get_timestamp(struct timeval tv_in);
+void	print_log(char str, t_philo *philo_s);
 
 int	main(int argc, char **argv)
 {
@@ -74,18 +77,77 @@ int	main(int argc, char **argv)
 	return (0);
 }
 
+// void	*monitor_death_eat(void *philo)
+// {
+
+// }
+
+// this function runs every time a thread created for a philosopher
+// takes as argument a struct which contains all info about this philosopher
 void	*thread_routine(void *philo)
 {
 	t_philo	*philo_s;
-	static int	count = 0;
+	int	first_fork;
+	int	sec_fork;
 
 	philo_s = (t_philo*)philo;
-	pthread_mutex_lock(&(philo_s->info->print_m));
-	printf("Thread [%ld]: Count at thread start = %d - %d\n", pthread_self(), philo_s->id, count++);
-	pthread_mutex_unlock(&(philo_s->info->print_m));
+	first_fork = philo_s->id;
+	sec_fork = philo_s->id;
+	if (philo_s->id % 2 == 1)
+		first_fork++;
+	else
+		sec_fork++;
+	while(42)
+	{
+		pthread_mutex_lock(&(philo_s->info->forks[first_fork]));
+		print_log('f', philo);
+		pthread_mutex_lock(&(philo_s->info->forks[sec_fork]));
+		print_log('f', philo);
+		print_log('e', philo);
+		if (gettimeofday(&(philo_s->last_eat), NULL) != 0)
+			return (0);
+		usleep(philo_s->info->eat_t);
+		pthread_mutex_unlock(&(philo_s->info->forks[sec_fork]));
+		pthread_mutex_unlock(&(philo_s->info->forks[first_fork]));
+		philo_s->eaten_n++;
+		print_log('s', philo);
+		usleep(philo_s->info->sleep_t);
+		print_log('t', philo);
+	}
 	return (NULL);
 }
 
+void	print_log(char str, t_philo *philo_s)
+{
+	static int	terminate = 0;
+
+	if (terminate)
+		return ;
+	pthread_mutex_lock(&(philo_s->info->print_m));
+	if (str == 'f')
+		printf("%ld %d has taken a fork\n", get_timestamp(philo_s->info->tv_in), philo_s->id);
+	else if (str == 'e')
+		printf("%ld %d is eating\n", get_timestamp(philo_s->info->tv_in), philo_s->id);
+	else if (str == 's')
+		printf("%ld %d is sleeping\n", get_timestamp(philo_s->info->tv_in), philo_s->id);
+	else if (str == 't')
+		printf("%ld %d is thinking\n", get_timestamp(philo_s->info->tv_in), philo_s->id);
+	else if (str == 'd')
+	{
+		printf("%ld %d died\nEND\n", get_timestamp(philo_s->info->tv_in), philo_s->id);
+		terminate = 1;
+	}
+	else if (str == 'a')
+	{
+		printf("%ld Everybody eat %d number of times\nEND\n", get_timestamp(philo_s->info->tv_in), philo_s->info->eat_n);
+		terminate = 1;
+	}
+	pthread_mutex_unlock(&(philo_s->info->print_m));
+}
+
+// returns a timestamp from time tv_in until now - current time
+// usefull to see if philo starved from last time started to eat
+// usefull also to print timestamp on logs
 long	get_timestamp(struct timeval tv_in)
 {
 	struct timeval	tv_cur;

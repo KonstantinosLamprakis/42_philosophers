@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/14 15:42:40 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/08 14:01:14 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/09 11:00:09 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ sleep_t: how much time needed to sleep
 eat_n: optional (-1 if not provided), how many times to eat before exit(0)
 phil_n: number of philosophers
 tv_in: timeval from the beggining of the program
+terminate: means all thread should return, due to died philo or eaten_number
  */
 typedef struct	s_info
 {
@@ -35,6 +36,7 @@ typedef struct	s_info
 	int	sleep_t;
 	int	eat_n;
 	int	phil_n;
+	int	terminate;
 	struct timeval	tv_in;
 	pthread_mutex_t	print_m;
 	pthread_mutex_t	*forks;
@@ -49,13 +51,13 @@ info = general info of the program
  */
 typedef struct	s_philo
 {
-	int			id;
-	char		state;
-	long		last_eat;
-	int			eaten_n;
-	pthread_t	thread;
-	t_info		*info;
-}				t_philo;
+	int				id;
+	char			state;
+	struct timeval	last_eat;
+	int				eaten_n;
+	pthread_t		thread;
+	t_info			*info;
+}					t_philo;
 
 // Declarations of validation.c
 int	check_input(t_info *t_ar, int argc, char **argv);

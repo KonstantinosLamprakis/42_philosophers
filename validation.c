@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:21:39 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/08 13:05:41 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/09 11:01:02 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ int	check_input(t_info *t_ar, int argc, char **argv)
 		t_ar->eat_n = -1;
 	if (err)
 		write(1, "Wrong Args\n", 11);
+	t_ar->terminate = 0;
 	return (!err);
 }
 
