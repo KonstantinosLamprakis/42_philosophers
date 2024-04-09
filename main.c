@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/09 21:46:13 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/09 22:00:49 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ long	get_timestamp(struct timeval tv_in);
 int		print_log(char str, t_philo *philo_s);
 void	*monitor_death_eat(void *philo);
 int		clean(int end_mutex, t_philo *philo, t_info info, int end_threads);
-int		init(int argc, char **argv, t_info *info, t_philo **philo);
-
+int		init_struct(int argc, char **argv, t_info *info_s, t_philo **philo_s);
+int		get_struct(int argc, char **argv, t_info *info_s, t_philo **philo_s);
 
 // args: number of philosophers, time to die, time to eat, time to sleep
 // optional arg: how many times to eat
@@ -47,18 +47,7 @@ int	main(int argc, char **argv)
 	int				i;
 	pthread_t		thread;
 
-	i = init(argc, argv, &info_s, &philo_s);
-	if (i  != -1)
-		return (clean(i, philo_s, info_s, 0));
-	while (++i < info_s.phil_n)
-	{
-		philo_s[i].eaten_n = 0;
-		philo_s[i].id = i;
-		philo_s[i].info = &info_s;
-		philo_s[i].state = 't';
-	}
-	if (gettimeofday(&(info_s.tv_in), NULL) != 0)
-		return (clean(info_s.phil_n, philo_s, info_s, 0));
+	i = get_struct(argc, argv, &info_s, &philo_s);
 	i = -1;
 	while (++i < info_s.phil_n)
 		if ((gettimeofday(&(philo_s[i].last_eat), NULL) != 0) || \
@@ -75,16 +64,43 @@ int	main(int argc, char **argv)
 	return (0);
 }
 
+// returns 0 on error, 1 on success
+// no need for caller to free anything, it deals with everything
+int	get_struct(int argc, char **argv, t_info *info_s, t_philo **philo_s)
+{
+	int	i;
+
+	i = init_struct(argc, argv, info_s, philo_s);
+	if (i != -1)
+	{
+		clean(i, *philo_s, *info_s, 0);
+		return (0);
+	}
+	while (++i < info_s->phil_n)
+	{
+		(*philo_s)[i].eaten_n = 0;
+		(*philo_s)[i].id = i;
+		(*philo_s)[i].info = info_s;
+		(*philo_s)[i].state = 't';
+	}
+	if (gettimeofday(&(info_s->tv_in), NULL) != 0)
+	{
+		clean(info_s->phil_n, *philo_s, *info_s, 0);
+		return (0);
+	}
+	return (1);
+}
+
 // returns
 // -1 on success
 // -2 on error with no need to free
 // i on error with need to free until ith mutex(without it)
 // also need to free one mutex for print, and structs(forks, philo)
-int	init(int argc, char **argv, t_info *info_s, t_philo **philo_s)
+int	init_struct(int argc, char **argv, t_info *info_s, t_philo **philo_s)
 {
 	int	i;
 
-	if(!check_input(info_s, argc, argv))
+	if (!check_input(info_s, argc, argv))
 		return (-2);
 	info_s->forks = malloc (sizeof(pthread_mutex_t) * info_s->phil_n);
 	if (!info_s->forks)
@@ -135,13 +151,13 @@ int	clean(int end_mutex, t_philo *philo, t_info info, int end_threads)
 void	*monitor_death_eat(void *philo)
 {
 	t_philo	*philo_s;
-	int	i;
-	int	is_eaten;
-	int	is_dead;
+	int		i;
+	int		is_eaten;
+	int		is_dead;
 
 	is_eaten = 0;
 	is_dead = 0;
-	philo_s = (t_philo*)philo;
+	philo_s = (t_philo *)philo;
 	while (!is_eaten && !is_dead)
 	{
 		i = -1;
@@ -167,13 +183,13 @@ void	*monitor_death_eat(void *philo)
 void	*thread_routine(void *philo)
 {
 	t_philo	*philo_s;
-	int	first_fork;
-	int	sec_fork;
+	int		first_fork;
+	int		sec_fork;
 
-	philo_s = (t_philo*)philo;
+	philo_s = (t_philo *)philo;
 	first_fork = philo_s->id + (philo_s->id % 2 == 1);
 	sec_fork = philo_s->id + (philo_s->id % 2 == 0);
-	while(!philo_s->info->terminate)
+	while (!philo_s->info->terminate)
 	{
 		pthread_mutex_lock(&(philo_s->info->forks[first_fork]));
 		print_log('f', philo);
@@ -235,7 +251,7 @@ int	print_log(char str, t_philo *philo_s)
 long	get_timestamp(struct timeval tv_in)
 {
 	struct timeval	tv_cur;
-	long	timestamp;
+	long			timestamp;
 
 	if (gettimeofday(&tv_cur, NULL) != 0)
 		return (-1);
