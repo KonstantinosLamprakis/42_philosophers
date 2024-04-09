@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/09 11:13:46 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/09 14:20:38 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,14 @@
 void	*thread_routine(void *philo);
 long	get_timestamp(struct timeval tv_in);
 void	print_log(char str, t_philo *philo_s);
+void	*monitor_death_eat(void *philo);
 
 int	main(int argc, char **argv)
 {
 	t_info			info_s;
 	t_philo			*philo_s;
 	int				i;
+	pthread_t		thread;
 
 	if(!check_input(&info_s, argc, argv))
 		return (1);
@@ -70,17 +72,49 @@ int	main(int argc, char **argv)
 		return (0);
 	i = -1;
 	while (++i < info_s.phil_n)
+	{
+		if (gettimeofday(&(philo_s[i].last_eat), NULL) != 0)
+			return (0);
 		pthread_create(&(philo_s[i].thread), NULL, thread_routine, (void *)&(philo_s[i]));
+	}
+	pthread_create(&thread, NULL, monitor_death_eat, (void *)(philo_s));
 	i = -1;
 	while (++i < info_s.phil_n)
 		pthread_join(philo_s[i].thread, NULL);
+	pthread_join(thread, NULL);
 	return (0);
 }
 
-// void	*monitor_death_eat(void *philo)
-// {
+void	*monitor_death_eat(void *philo)
+{
+	t_philo	*philo_s;
+	int	i;
+	int	is_eaten;
+	int	is_dead;
 
-// }
+	is_eaten = 0;
+	is_dead = 0;
+	philo_s = (t_philo*)philo;
+	while (!is_eaten && !is_dead)
+	{
+		i = -1;
+		is_eaten = philo_s[0].info->eat_n != -1;
+		while (is_eaten && ++i < philo_s[0].info->phil_n)
+		{
+			if (philo_s[i].eaten_n < philo_s[0].info->eat_n)
+				is_eaten = 0;
+		}
+		i = -1;
+		while (++i < philo_s[0].info->phil_n)
+			is_dead += get_timestamp(philo_s[i].last_eat) > philo_s[0].info->die_t;
+	}
+	if (is_dead)
+		print_log('d', &philo_s[0]);
+	else if (is_eaten)
+		print_log('a', &philo_s[0]);
+	philo_s[0].info->terminate = 1;
+	return (NULL);
+}
 
 // this function runs every time a thread created for a philosopher
 // takes as argument a struct which contains all info about this philosopher
@@ -97,7 +131,7 @@ void	*thread_routine(void *philo)
 		first_fork++;
 	else
 		sec_fork++;
-	while(42)
+	while(!philo_s->info->terminate)
 	{
 		pthread_mutex_lock(&(philo_s->info->forks[first_fork]));
 		print_log('f', philo);
@@ -121,9 +155,12 @@ void	print_log(char str, t_philo *philo_s)
 {
 	static int	terminate = 0;
 
-	if (terminate)
-		return ;
 	pthread_mutex_lock(&(philo_s->info->print_m));
+	if (terminate)
+	{
+		pthread_mutex_unlock(&(philo_s->info->print_m));
+		return ;
+	}
 	if (str == 'f')
 		printf("%ld %d has taken a fork\n", get_timestamp(philo_s->info->tv_in), philo_s->id);
 	else if (str == 'e')
