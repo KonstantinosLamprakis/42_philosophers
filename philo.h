@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/14 15:42:40 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/09 21:55:29 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/09 22:08:03 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,11 @@ typedef struct s_philo
 }					t_philo;
 
 // Declarations of validation.c
-int	check_input(t_info *t_ar, int argc, char **argv);
+int		check_input(t_info *t_ar, int argc, char **argv);
+// Declarations of philo_utils.c
+void	*thread_routine(void *philo);
+long	get_timestamp(struct timeval tv_in);
+int		print_log(char str, t_philo *philo_s);
+void	*monitor_death_eat(void *philo);
 
 #endif
