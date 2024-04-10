@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 22:04:52 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 12:48:46 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:03:54 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ static void	*loop_routine(t_philo *philo_s, int fork1, int fork2)
 		return (pthread_mutex_unlock(&(philo_s->info->forks[fork1])), NULL);
 	if (pthread_mutex_lock(&(philo_s->info->forks[fork2])) != 0)
 	{
-		printf("\nproblem: philo id: %d, fork: %d\n", philo_s->id, fork2);
 		pthread_mutex_unlock(&(philo_s->info->forks[fork1]));
 		return (philo_s->info->is_error = 2, NULL);
 	}

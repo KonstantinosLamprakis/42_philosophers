@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:21:39 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 09:35:37 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:03:37 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	check_input(t_info *info, int argc, char **argv)
 		return (0);
 	}
 	err += !is_int(argv[1], &info->phil_n) || !is_int(argv[2], &info->die_t);
-	err += !is_int(argv[3], &info->eat_n) || !is_int(argv[4], &info->sleep_t);
+	err += !is_int(argv[3], &info->eat_t) || !is_int(argv[4], &info->sleep_t);
 	if (argc == 6)
 		err += !is_int(argv[5], &info->eat_n);
 	else
