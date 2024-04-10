@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 22:04:52 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 13:03:54 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 15:27:16 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,12 +97,12 @@ static void	*loop_routine(t_philo *philo_s, int fork1, int fork2)
 		pthread_mutex_unlock(&(philo_s->info->forks[fork1]));
 		return (philo_s->info->is_error = 3, NULL);
 	}
-	usleep(philo_s->info->eat_t);
+	ft_usleep(philo_s->info->eat_t);
 	pthread_mutex_unlock(&(philo_s->info->forks[fork2]));
 	pthread_mutex_unlock(&(philo_s->info->forks[fork1]));
 	philo_s->eaten_n++;
 	print_log('s', philo_s);
-	usleep(philo_s->info->sleep_t);
+	ft_usleep(philo_s->info->sleep_t);
 	print_log('t', philo_s);
 	return (NULL);
 }

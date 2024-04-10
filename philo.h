@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/14 15:42:40 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 10:34:07 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 15:26:46 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ int		check_input(t_info *t_ar, int argc, char **argv);
 void	*thread_routine(void *philo);
 void	print_log(char str, t_philo *philo_s);
 void	*monitor_death_eat(void *philo);
+// Declarations of philo_utils2.c
+int		ft_usleep(size_t milliseconds);
 // Declarations of main.c
 long	get_timestamp(struct timeval tv_in);
 

@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 12:43:17 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 15:37:42 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,11 @@
 		and may have segm fault if use main's resources
 		- pthread_detach(): say that this thread has no longer nothing to do
 		with main, no resources, not accessible, it runs independently
+
+	./philo 5 800 200 200
+	./philo 5 600 150 150
+	./philo 4 410 200 200
+	./philo 100 800 200 200
 */
 
 int	clean(int end_mutex, t_philo *philo, t_info info, int end_threads);
@@ -160,7 +165,7 @@ long	get_timestamp(struct timeval tv_in)
 
 	if (gettimeofday(&tv_cur, NULL) != 0)
 		return (-1);
-	timestamp = (tv_cur.tv_sec - tv_in.tv_sec) \
-	* 1000000 + tv_cur.tv_usec - tv_in.tv_usec;
+	timestamp = ((tv_cur.tv_sec - tv_in.tv_sec) \
+	* 1000) + ((tv_cur.tv_usec - tv_in.tv_usec) / 1000);
 	return (timestamp);
 }

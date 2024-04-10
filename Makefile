@@ -6,14 +6,14 @@
 #    By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/08 02:28:31 by klamprak          #+#    #+#              #
-#    Updated: 2024/04/10 14:44:39 by klamprak         ###   ########.fr        #
+#    Updated: 2024/04/10 15:26:56 by klamprak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # for linux-valgrind add -pthread on flags and remove -I Headers
 CFLAGS = -Wall -Wextra -Werror
 
-SRCS = main.c validation.c philo_utils.c
+SRCS = main.c validation.c philo_utils.c philo_utils2.c
 
 OBJS = $(SRCS:.c=.o)
 
