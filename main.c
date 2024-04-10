@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/09 22:07:53 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 10:50:23 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@
 
 // TODO:
 // check for mem leaks
-// check for errors on thread_routine
-// check for errors wherever I have != 0
-// take care of case of single philo on table
 
 // https://www.geeksforgeeks.org/mutex-lock-for-linux-thread-synchronization/
 
@@ -43,6 +40,8 @@ int	main(int argc, char **argv)
 	pthread_t		thread;
 
 	i = get_struct(argc, argv, &info_s, &philo_s);
+	if (!i)
+		return (1);
 	i = -1;
 	while (++i < info_s.phil_n)
 		if ((gettimeofday(&(philo_s[i].last_eat), NULL) != 0) || \
@@ -56,7 +55,9 @@ int	main(int argc, char **argv)
 	while (++i < info_s.phil_n)
 		pthread_join(philo_s[i].thread, NULL);
 	pthread_join(thread, NULL);
-	clean(info_s.phil_n, philo_s, info_s, 0);
+	if (info_s.is_error)
+		printf("\nError occured\n");
+	clean(info_s.phil_n, philo_s, info_s, -1);
 	return (0);
 }
 
@@ -118,10 +119,19 @@ int	init_struct(int argc, char **argv, t_info *info_s, t_philo **philo_s)
 
 // end is the respectable i from init()
 // end = -2: nothing to free, end > 0 should free mutex until end
+// end_threads: how many threads should wait to join before cleaning
+// end_threads = -1 means no threads, no errors
+// end_threads = 0 means no threads, but error occured
+// end_threads > 0 means should wait for first ith threads, and also had error
 int	clean(int end_mutex, t_philo *philo, t_info info, int end_threads)
 {
 	int	i;
 
+	if (end_threads == -1)
+		end_threads = 0;
+	else
+		printf("Error occured\n");
+	printf("Cleaning\n");
 	if (end_threads > 0)
 	{
 		info.terminate = 1;
@@ -138,4 +148,19 @@ int	clean(int end_mutex, t_philo *philo, t_info info, int end_threads)
 	free(info.forks);
 	free(philo);
 	return (0);
+}
+
+// returns a timestamp from time tv_in until now - current time, -1 on error
+// usefull to see if philo starved from last time started to eat
+// usefull also to print timestamp on logs
+long	get_timestamp(struct timeval tv_in)
+{
+	struct timeval	tv_cur;
+	long			timestamp;
+
+	if (gettimeofday(&tv_cur, NULL) != 0)
+		return (-1);
+	timestamp = (tv_cur.tv_sec - tv_in.tv_sec) \
+	* 1000000 + tv_cur.tv_usec - tv_in.tv_usec;
+	return (timestamp);
 }

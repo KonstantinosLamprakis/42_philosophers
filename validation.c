@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:21:39 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/09 21:54:30 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 09:35:37 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 static int	is_int(char *str, int *result);
 static int	ft_atoi(const char *str);
 
-// returns 0 in error, 1 in success and puts the result on t_ar
+// returns 0 in error, 1 in success and puts the result on info
 // eat_n = -1 means there no argument for number of eating
 // validation: 5 or 6 number of args, all of them positive ints
-int	check_input(t_info *t_ar, int argc, char **argv)
+int	check_input(t_info *info, int argc, char **argv)
 {
 	int	err;
 
@@ -28,15 +28,16 @@ int	check_input(t_info *t_ar, int argc, char **argv)
 		write(1, "Wrong Args\n", 11);
 		return (0);
 	}
-	err += !is_int(argv[1], &t_ar->phil_n) || !is_int(argv[2], &t_ar->die_t);
-	err += !is_int(argv[3], &t_ar->eat_n) || !is_int(argv[4], &t_ar->sleep_t);
+	err += !is_int(argv[1], &info->phil_n) || !is_int(argv[2], &info->die_t);
+	err += !is_int(argv[3], &info->eat_n) || !is_int(argv[4], &info->sleep_t);
 	if (argc == 6)
-		err += !is_int(argv[5], &t_ar->eat_n);
+		err += !is_int(argv[5], &info->eat_n);
 	else
-		t_ar->eat_n = -1;
+		info->eat_n = -1;
 	if (err)
 		write(1, "Wrong Args\n", 11);
-	t_ar->terminate = 0;
+	info->terminate = 0;
+	info->is_error = 0;
 	return (!err);
 }
 

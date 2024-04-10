@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/14 15:42:40 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/09 22:08:03 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 10:34:07 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ typedef struct s_info
 	int				eat_n;
 	int				phil_n;
 	int				terminate;
+	int				is_error;
 	struct timeval	tv_in;
 	pthread_mutex_t	print_m;
 	pthread_mutex_t	*forks;
@@ -63,8 +64,9 @@ typedef struct s_philo
 int		check_input(t_info *t_ar, int argc, char **argv);
 // Declarations of philo_utils.c
 void	*thread_routine(void *philo);
-long	get_timestamp(struct timeval tv_in);
-int		print_log(char str, t_philo *philo_s);
+void	print_log(char str, t_philo *philo_s);
 void	*monitor_death_eat(void *philo);
+// Declarations of main.c
+long	get_timestamp(struct timeval tv_in);
 
 #endif

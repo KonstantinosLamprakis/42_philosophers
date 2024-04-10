@@ -6,15 +6,18 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 22:04:52 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/09 22:08:11 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 10:50:44 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+static void	print_str(char str, long stamp, t_philo *philo_s);
+static void	*loop_routine(t_philo *philo_s, int fork1, int fork2);
+
 // runs constantly until a thread die or all eat the number required
 // then they terminate them setting the flag terinate as 1
-// if is_dead == -1 don't print neither 'a' or 'b' because is due to
+// if is_dead == -1 don't print neither 'a' or 'b' because is due to -
 // error on get_timestamp, will just terminate the program
 void	*monitor_death_eat(void *philo)
 {
@@ -26,7 +29,7 @@ void	*monitor_death_eat(void *philo)
 	is_eaten = 0;
 	is_dead = 0;
 	philo_s = (t_philo *)philo;
-	while (!is_eaten && !is_dead)
+	while (!is_eaten && !is_dead && !philo_s[0].info->is_error)
 	{
 		i = -1;
 		is_eaten = philo_s[0].info->eat_n != -1;
@@ -41,6 +44,7 @@ void	*monitor_death_eat(void *philo)
 	if (is_dead > 0 || is_eaten)
 		print_log('a' + (is_dead > 0), &philo_s[--i]);
 	philo_s[0].info->terminate = 1;
+	philo_s[0].info->is_error += is_dead == -1;
 	return (NULL);
 }
 
@@ -52,70 +56,94 @@ void	*monitor_death_eat(void *philo)
 void	*thread_routine(void *philo)
 {
 	t_philo	*philo_s;
-	int		first_fork;
-	int		sec_fork;
+	int		fork1;
+	int		fork2;
 
 	philo_s = (t_philo *)philo;
-	first_fork = philo_s->id + (philo_s->id % 2 == 1);
-	sec_fork = philo_s->id + (philo_s->id % 2 == 0);
-	while (!philo_s->info->terminate)
+	fork1 = philo_s->id + (philo_s->id % 2 == 1);
+	if (philo_s->id == philo_s->info->phil_n - 1)
+		fork1 = 0;
+	fork2 = philo_s->id + (philo_s->id % 2 == 0);
+	while (!philo_s->info->terminate && !philo_s->info->is_error)
 	{
-		pthread_mutex_lock(&(philo_s->info->forks[first_fork]));
-		print_log('f', philo);
-		pthread_mutex_lock(&(philo_s->info->forks[sec_fork]));
-		print_log('f', philo);
-		print_log('e', philo);
-		if (gettimeofday(&(philo_s->last_eat), NULL) != 0)
-			return (0);
-		usleep(philo_s->info->eat_t);
-		pthread_mutex_unlock(&(philo_s->info->forks[sec_fork]));
-		pthread_mutex_unlock(&(philo_s->info->forks[first_fork]));
-		philo_s->eaten_n++;
-		print_log('s', philo);
-		usleep(philo_s->info->sleep_t);
-		print_log('t', philo);
+		loop_routine(philo_s, fork1, fork2);
+		if (philo_s->info->phil_n == 1)
+			break ;
 	}
 	return (NULL);
 }
 
-// returns a timestamp from time tv_in until now - current time, -1 on error
-// usefull to see if philo starved from last time started to eat
-// usefull also to print timestamp on logs
-long	get_timestamp(struct timeval tv_in)
+static void	*loop_routine(t_philo *philo_s, int fork1, int fork2)
 {
-	struct timeval	tv_cur;
-	long			timestamp;
-
-	if (gettimeofday(&tv_cur, NULL) != 0)
-		return (-1);
-	timestamp = (tv_cur.tv_sec - tv_in.tv_sec) \
-	* 1000000 + tv_cur.tv_usec - tv_in.tv_usec;
-	return (timestamp);
+	if (pthread_mutex_lock(&(philo_s->info->forks[fork1])) != 0)
+		return (philo_s->info->is_error = 1, NULL);
+	print_log('f', philo_s);
+	if (philo_s->info->phil_n == 1)
+		return (pthread_mutex_unlock(&(philo_s->info->forks[fork1])), NULL);
+	if (pthread_mutex_lock(&(philo_s->info->forks[fork2])) != 0)
+	{
+		pthread_mutex_unlock(&(philo_s->info->forks[fork1]));
+		return (philo_s->info->is_error = 1, NULL);
+	}
+	print_log('e', philo_s);
+	if (gettimeofday(&(philo_s->last_eat), NULL) != 0)
+	{
+		pthread_mutex_unlock(&(philo_s->info->forks[fork2]));
+		pthread_mutex_unlock(&(philo_s->info->forks[fork1]));
+		return (philo_s->info->is_error = 1, NULL);
+	}
+	usleep(philo_s->info->eat_t);
+	pthread_mutex_unlock(&(philo_s->info->forks[fork2]));
+	pthread_mutex_unlock(&(philo_s->info->forks[fork1]));
+	philo_s->eaten_n++;
+	print_log('s', philo_s);
+	usleep(philo_s->info->sleep_t);
+	print_log('t', philo_s);
+	return (NULL);
 }
 
-// returns 0 in error, 1 in success
 // prints the logs
-// str is 'f' for fork, 'e' for eating, 's' for sleeping
+// str is 'f' for fork, 'e' for eating(and grab 2nd fork), 's' for sleeping
 // 't' for thinking, 'b' for dead and 'a' for all eat enough
 // after 'b' or 'a' stops printing anything
-// terinate check should be after mutex_lock because otherwise
+// terinate check should be after mutex_lock because otherwise -
 // may be waiting there and not notice the change on terminate var
-int	print_log(char str, t_philo *philo_s)
+// update error and terminate variable as needed
+void	print_log(char str, t_philo *philo_s)
 {
 	static int	terminate = 0;
 	long		stamp;
 
+	if (pthread_mutex_lock(&(philo_s->info->print_m)) != 0)
+	{
+		philo_s->info->is_error = 1;
+		return ;
+	}
 	stamp = get_timestamp(philo_s->info->tv_in);
 	if (stamp == -1)
-		return (0);
-	if (pthread_mutex_lock(&(philo_s->info->print_m)) != 0)
-		return (0);
+	{
+		philo_s->info->is_error = 1;
+		pthread_mutex_unlock(&(philo_s->info->print_m));
+		return ;
+	}
 	if (terminate)
-		return (pthread_mutex_unlock(&(philo_s->info->print_m)) == 0);
+	{
+		pthread_mutex_unlock(&(philo_s->info->print_m));
+		return ;
+	}
+	print_str(str, stamp, philo_s);
+	terminate = (str == 'a') || (str == 'b');
+	if (pthread_mutex_unlock(&(philo_s->info->print_m)) != 0)
+		philo_s->info->is_error = 1;
+}
+
+static void	print_str(char str, long stamp, t_philo *philo_s)
+{
 	if (str == 'f')
 		printf("%ld %d has taken a fork\n", stamp, philo_s->id);
 	else if (str == 'e')
-		printf("%ld %d is eating\n", stamp, philo_s->id);
+		printf("%ld %d has taken second fork\n%ld %d is eating\n" \
+		, stamp, philo_s->id, stamp, philo_s->id);
 	else if (str == 's')
 		printf("%ld %d is sleeping\n", stamp, philo_s->id);
 	else if (str == 't')
@@ -125,6 +153,4 @@ int	print_log(char str, t_philo *philo_s)
 	else if (str == 'a')
 		printf("%ld Everybody eat %d number of times\nEND\n", \
 		stamp, philo_s->info->eat_n);
-	terminate = (str == 'a') || (str == 'b');
-	return (pthread_mutex_unlock(&(philo_s->info->print_m)) == 0);
 }
