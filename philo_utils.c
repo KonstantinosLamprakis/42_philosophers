@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 22:04:52 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 10:50:44 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 12:48:46 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,14 @@ void	*thread_routine(void *philo)
 
 	philo_s = (t_philo *)philo;
 	fork1 = philo_s->id + (philo_s->id % 2 == 1);
-	if (philo_s->id == philo_s->info->phil_n - 1)
-		fork1 = 0;
 	fork2 = philo_s->id + (philo_s->id % 2 == 0);
+	if (philo_s->id == philo_s->info->phil_n - 1)
+	{
+		if (fork1 == philo_s->info->phil_n)
+			fork1 = 0;
+		else if (fork2 == philo_s->info->phil_n)
+			fork2 = 0;
+	}
 	while (!philo_s->info->terminate && !philo_s->info->is_error)
 	{
 		loop_routine(philo_s, fork1, fork2);
@@ -82,15 +87,16 @@ static void	*loop_routine(t_philo *philo_s, int fork1, int fork2)
 		return (pthread_mutex_unlock(&(philo_s->info->forks[fork1])), NULL);
 	if (pthread_mutex_lock(&(philo_s->info->forks[fork2])) != 0)
 	{
+		printf("\nproblem: philo id: %d, fork: %d\n", philo_s->id, fork2);
 		pthread_mutex_unlock(&(philo_s->info->forks[fork1]));
-		return (philo_s->info->is_error = 1, NULL);
+		return (philo_s->info->is_error = 2, NULL);
 	}
 	print_log('e', philo_s);
 	if (gettimeofday(&(philo_s->last_eat), NULL) != 0)
 	{
 		pthread_mutex_unlock(&(philo_s->info->forks[fork2]));
 		pthread_mutex_unlock(&(philo_s->info->forks[fork1]));
-		return (philo_s->info->is_error = 1, NULL);
+		return (philo_s->info->is_error = 3, NULL);
 	}
 	usleep(philo_s->info->eat_t);
 	pthread_mutex_unlock(&(philo_s->info->forks[fork2]));
@@ -116,13 +122,13 @@ void	print_log(char str, t_philo *philo_s)
 
 	if (pthread_mutex_lock(&(philo_s->info->print_m)) != 0)
 	{
-		philo_s->info->is_error = 1;
+		philo_s->info->is_error = 4;
 		return ;
 	}
 	stamp = get_timestamp(philo_s->info->tv_in);
 	if (stamp == -1)
 	{
-		philo_s->info->is_error = 1;
+		philo_s->info->is_error = 5;
 		pthread_mutex_unlock(&(philo_s->info->print_m));
 		return ;
 	}
@@ -134,7 +140,7 @@ void	print_log(char str, t_philo *philo_s)
 	print_str(str, stamp, philo_s);
 	terminate = (str == 'a') || (str == 'b');
 	if (pthread_mutex_unlock(&(philo_s->info->print_m)) != 0)
-		philo_s->info->is_error = 1;
+		philo_s->info->is_error = 6;
 }
 
 static void	print_str(char str, long stamp, t_philo *philo_s)

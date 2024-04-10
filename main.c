@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 10:50:23 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/10 12:43:17 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	main(int argc, char **argv)
 		pthread_join(philo_s[i].thread, NULL);
 	pthread_join(thread, NULL);
 	if (info_s.is_error)
-		printf("\nError occured\n");
+		printf("\nError occured 1: %d\n", info_s.is_error);
 	clean(info_s.phil_n, philo_s, info_s, -1);
 	return (0);
 }
@@ -130,7 +130,7 @@ int	clean(int end_mutex, t_philo *philo, t_info info, int end_threads)
 	if (end_threads == -1)
 		end_threads = 0;
 	else
-		printf("Error occured\n");
+		printf("Error occured 2\n");
 	printf("Cleaning\n");
 	if (end_threads > 0)
 	{
