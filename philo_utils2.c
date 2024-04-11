@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/10 15:25:59 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 15:38:29 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/11 06:40:18 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,12 @@ int	ft_usleep(size_t milliseconds)
 
 	start = get_current_time();
 	while ((get_current_time() - start) < milliseconds)
-		usleep(milliseconds / 10);
+		usleep(50);
 	return (0);
 }
 // Gets the current time in milliseconds
-
+// 1 sec = 1000 mili = 1000000 micro
+// usleep take as parameter microseconds and may have a small delay in msec
 size_t	get_current_time(void)
 {
 	struct timeval	time;
