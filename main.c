@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 15:37:42 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/11 06:55:40 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,14 +158,8 @@ int	clean(int end_mutex, t_philo *philo, t_info info, int end_threads)
 // returns a timestamp from time tv_in until now - current time, -1 on error
 // usefull to see if philo starved from last time started to eat
 // usefull also to print timestamp on logs
-long	get_timestamp(struct timeval tv_in)
+int	get_timestamp(struct timeval tv_in)
 {
-	struct timeval	tv_cur;
-	long			timestamp;
-
-	if (gettimeofday(&tv_cur, NULL) != 0)
-		return (-1);
-	timestamp = ((tv_cur.tv_sec - tv_in.tv_sec) \
-	* 1000) + ((tv_cur.tv_usec - tv_in.tv_usec) / 1000);
-	return (timestamp);
+	return ((int)(get_current_time() - (tv_in.tv_sec * 1000 + \
+	tv_in.tv_usec / 1000)));
 }

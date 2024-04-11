@@ -6,13 +6,11 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/10 15:25:59 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/11 06:41:12 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/11 06:52:34 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-size_t	get_current_time(void);
 
 // Improved version of sleep function
 int	ft_usleep(size_t milliseconds)

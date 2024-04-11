@@ -6,7 +6,7 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 22:04:52 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/10 15:27:16 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/11 06:53:02 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ static void	*loop_routine(t_philo *philo_s, int fork1, int fork2)
 void	print_log(char str, t_philo *philo_s)
 {
 	static int	terminate = 0;
-	long		stamp;
+	int			stamp;
 
 	if (pthread_mutex_lock(&(philo_s->info->print_m)) != 0)
 	{
