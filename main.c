@@ -6,14 +6,11 @@
 /*   By: klamprak <klamprak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 03:13:26 by klamprak          #+#    #+#             */
-/*   Updated: 2024/04/11 06:55:40 by klamprak         ###   ########.fr       */
+/*   Updated: 2024/04/11 14:21:32 by klamprak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-// TODO:
-// check for mem leaks
 
 // https://www.geeksforgeeks.org/mutex-lock-for-linux-thread-synchronization/
 
@@ -28,7 +25,6 @@
 	./philo 5 800 200 200
 	./philo 5 600 150 150
 	./philo 4 410 200 200
-	./philo 100 800 200 200
 */
 
 int	clean(int end_mutex, t_philo *philo, t_info info, int end_threads);
